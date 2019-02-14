@@ -46,30 +46,30 @@ void EventAction::EndOfEventAction(const G4Event* event)
   // Get the hits collection of the event
   G4HCofThisEvent* hce = event->GetHCofThisEvent();
 
-//  if (!hce)
-//  {
-//    G4ExceptionDescription msg;
-//    msg << "No hits collection of this event found.\n";
-//    G4Exception("EventAction::EndOfEventAction()",
-//                "Code001",
-//                JustWarning,
-//                msg);
-//    return;
-//  }
+  if (!hce)
+  {
+    G4ExceptionDescription msg;
+    msg << "No hits collection of this event found.\n";
+    G4Exception("EventAction::EndOfEventAction()",
+                "Code001",
+                JustWarning,
+                msg);
+    return;
+  }
 
   // Get the collection corresponding to the phantom
   TrackHitsCollection* trackHC = static_cast<TrackHitsCollection*>(hce->GetHC(fTrackHCID));
 
-//  if ( (!trackHC) )
-//  {
-//      G4ExceptionDescription msg;
-//      msg << "Some of the hits collections of this event not found.\n";
-//      G4Exception("EventAction::EndOfEventAction()",
-//              "Code001",
-//              JustWarning,
-//              msg);
-//      return;
-//  }
+  if ( (!trackHC) )
+  {
+      G4ExceptionDescription msg;
+      msg << "Some of the hits collections of this event not found.\n";
+      G4Exception("EventAction::EndOfEventAction()",
+              "Code001",
+              JustWarning,
+              msg);
+      return;
+  }
 
   // Display hits
   G4int n_hit = trackHC->entries();
