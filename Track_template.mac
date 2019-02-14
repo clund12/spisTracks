@@ -1,0 +1,34 @@
+# Initialize the kernel
+/run/initialize
+
+/hits/verbose 0
+/tracking/verbose 0
+/process/verbose 0
+/particle/verbose 0
+/event/verbose 0
+/run/verbose 0
+/cuts/verbose 0
+/control/verbose 0
+/gps/verbose 0
+/material/verbose 0
+
+/gps/particle   {pName}
+
+/gps/ene/type   User
+/gps/hist/type  energy
+
+####################################################################################################
+# Input spectra from histogram file here
+
+{histo}
+
+####################################################################################################
+
+/gps/pos/type   Point
+/gps/pos/centre 0 0 0 cm
+
+
+/gps/number   1
+/gps/ang/type iso
+
+/run/beamOn 1
