@@ -4,7 +4,7 @@
 % files
 % ex:
 % spisTracks_Bin2Mat('/Users/Piotr/Documents/Geant4Work/builds/SPIS_final/spisTracks_valBF_10keV');
-function CsvToMat(folderName)
+function CSVToMat(folderName)
 
     files = dir([folderName '/*.csv']);
     nFiles = length(files);

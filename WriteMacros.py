@@ -43,7 +43,7 @@ else:
 ################################################################################
 
 histoPath = '/home/chris/geant4/work/Data/Spectra/Neutrons/Histos/2019-01-25/'
-histoFileName = pname+'_scorer'+scorer+'_energy_histogram_'+ekin+'.dat'
+histoFileName = pname+'s_scorer'+scorer+'_energy_histogram_'+ekin+'.dat'
 
 fileName = histoPath+histoFileName
 with open(fileName, 'r') as f:
@@ -52,8 +52,8 @@ with open(fileName, 'r') as f:
 
 # write a new macro file, where all strings matching entries in a dictionary being replaced by the chosen values
 trackRange = '{1..'+trackNumber+'}'
-macroName = 'Track_'+ekin+'_scorer'+scorer+'_'+pname+'.mac'
-outputName = '/home/chris/geant4/work/Data/Tracks/Neutrons/'+ekin+'/'+pname.title()
+macroName = 'Track_'+ekin+'_scorer'+scorer+'_'+pname+'s.mac'
+outputName = '/home/chris/geant4/work/Data/Tracks/Neutrons/'+ekin+'/'+pname.title()+'s'
 
 params = {
         'pName':pname,
