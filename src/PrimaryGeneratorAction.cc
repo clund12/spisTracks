@@ -27,6 +27,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
     fGPS->GeneratePrimaryVertex(anEvent);    
 
-    //G4double energy = fGPS->GetParticleEnergy();
-    //G4cout << "The energy is actually " << G4BestUnit(energy, "Energy") << G4endl;
+    G4double energy = fGPS->GetParticleEnergy();
+    G4cout << "The energy is " << G4BestUnit(energy, "Energy") << G4endl;
 }

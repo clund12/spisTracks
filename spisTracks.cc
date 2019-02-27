@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
   G4String outputName = argv[2]+trString+argv[3];
 
   G4RunManager* runManager = new G4RunManager();
-  runManager->SetVerboseLevel(0);
-  runManager->SetPrintProgress(0);
+//  runManager->SetVerboseLevel(0);
+//  runManager->SetPrintProgress(0);
   //G4MTRunManager* runManager = new G4MTRunManager();
   //RunManager* runManager = new RunManager(outputName);
 
@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 //
   // get the pointer to the UI manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
-  NullSession* nullSession = new NullSession;
-  UImanager->SetCoutDestination(nullSession);
+//  NullSession* nullSession = new NullSession;
+//  UImanager->SetCoutDestination(nullSession);
 
   G4UIExecutive* ui(0);
 //
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 //  }
 //
 //  delete visManager;
-  delete nullSession;
+//  delete nullSession;
   delete runManager;
 //
   return 0;

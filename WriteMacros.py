@@ -4,6 +4,23 @@ import sys
 
 ################################################################################
 
+def updatePname(x):
+    if x == 'electron':
+        x = 'e-'
+    elif x == 'deuteron':
+        x = 'proton'
+    elif x == 'carbon':
+        x = 'GenericIon'+'\n'+'/gps/ion 6 12'
+    elif x == 'nitrogen':
+        x = 'GenericIon'+'\n'+'/gps/ion 7 14'
+    elif x == 'oxygen':
+        x = 'GenericIon'+'\n'+'/gps/ion 8 16'
+    else:
+        x = x
+    return x
+
+################################################################################
+
 # open the template macro file and the submission_script template
 template_file = open('Track_template.mac')
 submission_file = open('Bash_template.sh')
@@ -51,31 +68,56 @@ with open(fileName, 'r') as f:
 
 
 # write a new macro file, where all strings matching entries in a dictionary being replaced by the chosen values
-trackRange = '{1..'+trackNumber+'}'
 macroName = 'Track_'+ekin+'_scorer'+scorer+'_'+pname+'s.mac'
-outputName = '/home/chris/geant4/work/Data/Tracks/Neutrons/'+ekin+'/'+pname.title()+'s'
+
+scorerName = {
+        '1':'Inner',
+        '2':'Intermediate',
+        '3':'Outer'
+        }
+
+#trackRange = '{1..'+trackNumber+'}'
+
+for i in range(3):
+    outputSuffix = ekin+'/'+scorerName[scorer]+'/'+pname.title()+'s'
+    outputName = '/home/chris/geant4/work/Data/Tracks/Neutrons/'+outputSuffix+'/run'+str(i+1)
+    macroFolder = 'macros/Neutrons/'+outputSuffix
+
+    for j in range(50):
+        start = j*int(trackNumber) + 1
+        end = start + int(trackNumber) - 1
+        trackRange = '{'+str(start)+'..'+str(end)+'}'
+
+        subparams = {
+                'trackRange':trackRange,
+                'macroName':macroName,
+                'outputName':outputName
+                }
+
+        bashName = macroName[:-4]+'_run'+str(i+1)+'-'+str(j)+'.sh'
+        bashPath = macroFolder+'/'+bashName
+
+        with open(bashPath, 'w') as f:
+            f.write(submission_string.format(**subparams))
+
+        with open('pass-to-blade.sh', 'a') as f:
+            f.write('sbatch -p batch -N1 -n1 '+bashName+'\n')
+ 
+
+pname = updatePname(pname)
 
 params = {
         'pName':pname,
         'histo':histoData
         }
 
-subparams = {
-        'trackRange':trackRange,
-        'macroName':macroName,
-        'outputName':outputName
-        }
-
-with open(macroName, 'w') as f:
+with open(macroFolder+'/'+macroName, 'w') as f:
     f.write(template_string.format(**params))
 
-bashName = macroName[:-4]+'.sh'
-with open(bashName, 'w') as f:
-    f.write(submission_string.format(**subparams))
-
+          
 # create a bash file to call all scripts in one go
 #with open('pass-to-blade.sh','a') as bladefile:
 #    bladefile.write('sbatch -p batch -N1 -n'+str(nthreads)+' Cluster'+forname+'.sh'+'\n')
 #    bladefile.write('sbatch -p batch -N1 -n1 Cluster'+forname+'.sh'+'\n')
-
-################################################################################
+           
+#################################################################################

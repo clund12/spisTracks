@@ -8,6 +8,7 @@
 #include "G4ProductionCuts.hh"
 #include "G4NistManager.hh"
 #include "G4Material.hh"
+#include "G4Region.hh"
 
 // Physical and Logical volume classes always necessary
 #include "G4Orb.hh"
@@ -96,6 +97,9 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
             "Target"
             );
 
+    G4Region* targetRegion = 
+        new G4Region("Target");
+
     new G4PVPlacement(
             0,
             G4ThreeVector(),
@@ -105,6 +109,8 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
             false,
             0
             );
+
+    targetRegion->AddRootLogicalVolume(fTargetLogical);
 
 /* *************************************************************************************************
 * VISUALIZATION COLOURS
