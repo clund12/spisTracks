@@ -32,22 +32,14 @@ RunAction::RunAction(G4String fileName)
     if ( IsMaster() ) {
 
         analysisManager->CreateNtuple(
-                "RawData",                                          // name
-                "Positions and sizes of energy deposition events"); // title
-        analysisManager->CreateNtupleIColumn("Event ID");
-        analysisManager->CreateNtupleIColumn("Particle ID");
-        analysisManager->CreateNtupleIColumn("Process ID");
-        analysisManager->CreateNtupleDColumn("post x-position");
-        analysisManager->CreateNtupleDColumn("post y-position");
-        analysisManager->CreateNtupleDColumn("post z-position");
-        analysisManager->CreateNtupleDColumn("pre x-position");
-        analysisManager->CreateNtupleDColumn("pre y-position");
-        analysisManager->CreateNtupleDColumn("pre z-position");
-        analysisManager->CreateNtupleDColumn("pre kinetic energy");
-        analysisManager->CreateNtupleDColumn("energy deposited");
-        analysisManager->CreateNtupleDColumn("energy transferred");
-        analysisManager->CreateNtupleIColumn("Track ID");
-        analysisManager->CreateNtupleIColumn("Parent ID");
+                "ys",                      // name
+                "Microdosimetric distributions"); // title
+        analysisManager->CreateNtupleDColumn("Sampling volume radius");
+        analysisManager->CreateNtupleIColumn("Number of transfer points in track");
+        analysisManager->CreateNtupleDColumn("Weighted imparted energy [eV]");
+        analysisManager->CreateNtupleDColumn("Weighted squared imparted energy [eV2]");
+        //analysisManager->CreateNtupleDColumn("Specific energy [Gy]");
+        analysisManager->CreateNtupleDColumn("Associated volume");
         analysisManager->FinishNtuple();
 
     }

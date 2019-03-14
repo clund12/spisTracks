@@ -10,13 +10,15 @@ function CSVToMat(folderName)
     nFiles = length(files);
     
     for j = 1:nFiles
+
+        display(['Converting track ' num2str(j) ' of ' num2str(nFiles)])
         fileName = [folderName '/' files(j).name];
         
         
-        interactions = csvread(fileName, 18, 0)
+        interactions = csvread(fileName, 18, 0);
         f2=[fileName(1:end-3) 'mat'];
         save(f2,'interactions','-mat','-v7.3');
-        %delete(fileName);
+        delete(fileName);
 
 
         % event ID; particle ID; process ID; pre-step point xyz; post-step point xyz;

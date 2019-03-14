@@ -19,8 +19,12 @@ class TrackSD : public G4VSensitiveDetector
       TrackSD(G4String name);
       virtual ~TrackSD();
 
-      virtual void Initialize(G4HCofThisEvent* HCE);
-      virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist);
+      virtual void   Initialize(G4HCofThisEvent*);
+      virtual G4bool ProcessHits(G4Step*, G4TouchableHistory*);
+      virtual void   EndOfEvent(G4HCofThisEvent*);
+
+      //virtual std::vec<double> GetAssociatedVolumes(std::vec<double>);
+      virtual G4double GetAssociatedVolumeWeight(G4double);
 
       void SetDose(G4double dose) { fDose = dose; }
       G4double GetDose() const { return fDose; }

@@ -8,6 +8,7 @@
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
 #include "RunManager.hh"
+#include "MTRunManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

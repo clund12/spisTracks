@@ -3,9 +3,10 @@
 #include "ActionInitialization.hh"
 #include "NullSession.hh"
 
-#include "G4RunManager.hh"
+//#include "G4RunManager.hh"
 //#include "G4MTRunManager.hh"
-//#include "RunManager.hh"
+#include "RunManager.hh"
+#include "MTRunManager.hh"
 
 #include "G4UImanager.hh"
 //#include "G4UIterminal.hh"
@@ -25,10 +26,10 @@ int main(int argc, char* argv[])
   G4String trString = "/track";
   G4String outputName = argv[2]+trString+argv[3];
 
-  G4RunManager* runManager = new G4RunManager();
+//  G4RunManager* runManager = new G4RunManager();
 //  runManager->SetVerboseLevel(0);
 //  runManager->SetPrintProgress(0);
-  //G4MTRunManager* runManager = new G4MTRunManager();
+  MTRunManager* runManager = new MTRunManager(outputName);
   //RunManager* runManager = new RunManager(outputName);
 
   DetectorConstruction* detector = new DetectorConstruction;
