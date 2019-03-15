@@ -2,11 +2,14 @@
 #include "PrimaryGeneratorAction.hh"
 #include "DetectorConstruction.hh"
 #include "Analysis.hh"
+#include "RunManager.hh"
+#include "MTRunManager.hh"
 
 #include "G4Run.hh"
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
-#include "RunManager.hh"
+#include "G4AccumulableManager.hh"
+#include "G4Accumulable.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -14,10 +17,12 @@
 #include "Randomize.hh"
 #include <time.h>
 
+#include <string>
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction(G4String fileName)
- : G4UserRunAction(), fFileName(fileName)
+RunAction::RunAction()
+ : G4UserRunAction()
 {
 
     G4long seed=time(0);
@@ -25,32 +30,42 @@ RunAction::RunAction(G4String fileName)
     // Create analysis manager
     auto analysisManager = G4AnalysisManager::Instance();
     analysisManager->SetVerboseLevel(0);
-    //analysisManager->SetNtupleMerging(true);
 
     //G4cout << "Using " << analysisManager->GetType() << G4endl;
 
-    if ( IsMaster() ) {
 
-        analysisManager->CreateNtuple(
-                "ys",                      // name
-                "Microdosimetric distributions"); // title
-        analysisManager->CreateNtupleDColumn("Sampling volume radius");
-        analysisManager->CreateNtupleIColumn("Number of transfer points in track");
-        analysisManager->CreateNtupleDColumn("Weighted imparted energy [eV]");
-        analysisManager->CreateNtupleDColumn("Weighted squared imparted energy [eV2]");
-        //analysisManager->CreateNtupleDColumn("Specific energy [Gy]");
-        analysisManager->CreateNtupleDColumn("Associated volume");
-        analysisManager->FinishNtuple();
+    analysisManager->CreateNtuple(
+            "ys",                      // name
+            "Microdosimetric distributions"); // title
+    //analysisManager->CreateNtupleDColumn("Sampling volume radius");
+    //analysisManager->CreateNtupleIColumn("Number of transfer points in track");
+    //analysisManager->CreateNtupleDColumn("Weighted imparted energy [eV]");
+    //analysisManager->CreateNtupleDColumn("Weighted squared imparted energy [eV2]");
+    analysisManager->CreateNtupleDColumn("yF [keV/um]");
+    analysisManager->CreateNtupleDColumn("yD [keV/um]");
+//    analysisManager->CreateNtupleDColumn("Sum(wAv)");
+    //analysisManager->CreateNtupleDColumn("Specific energy [Gy]");
+    //analysisManager->CreateNtupleDColumn("Associated volume");
+    analysisManager->FinishNtuple();
+
+
+    G4AccumulableManager* accMan = G4AccumulableManager::Instance();
+
+    // yD accumulables
+    fNradii = 5;
+    G4String yFName, yDName, wAvName, counterString;
+    for ( int i=0; i<fNradii; ++i )
+    {
+        counterString = std::to_string(i);
+        yFName = "yF"+counterString;
+        yDName = "yD"+counterString;
+        wAvName = "wAv"+counterString;
+
+        accMan->CreateAccumulable<G4double>(yFName,  0.);
+        accMan->CreateAccumulable<G4double>(yDName,  0.);
+        accMan->CreateAccumulable<G4double>(wAvName, 0.);
 
     }
-
-   // G4int nbins = 500;
-   // G4double vmin = 1.;
-   // G4double vmax = 10000000.;
-   // const G4String& unitName = "none";
-   // const G4String& fcnName = "none";
-   // const G4String& binScheme = "log";
-   // analysisManager->CreateH1("1","Primary particle spectra", nbins, vmin, vmax, unitName, fcnName, binScheme);
 
 }
 
@@ -67,15 +82,17 @@ RunAction::~RunAction()
 void RunAction::BeginOfRunAction(const G4Run* run)
 {
 
+    G4AccumulableManager* accMan = G4AccumulableManager::Instance();
+    accMan->Reset();
+
     // Open an output file (file type handled automatically)
-    //if ( IsMaster() ) {
+    if ( IsMaster() ) {
 
         // Get analysis manager
         auto analysisManager = G4AnalysisManager::Instance();
-        //G4String fileName = RunManager::GetFileName();
-        analysisManager->OpenFile(fFileName);
+        analysisManager->OpenFile();
 
-    //}
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -83,12 +100,53 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 void RunAction::EndOfRunAction(const G4Run* aRun)
 {
 
-    //if ( IsMaster() ) {
-        // Save histograms
-        auto analysisManager = G4AnalysisManager::Instance();
+    G4AccumulableManager* accMan = G4AccumulableManager::Instance();
+    accMan->Merge();
 
+    if ( IsMaster() )
+    {
+        auto analysisManager = G4AnalysisManager::Instance();
+    
+        // Write values to ntuple
+        G4String yFName, yDName, wAvName, counterString;
+        G4double yF, yD, wAv;
+        for ( int j=0; j<fNradii; ++j )
+        {
+    
+            counterString = std::to_string(j);
+            yFName = "yF"+counterString;
+            yDName = "yD"+counterString;
+            wAvName = "wAv"+counterString;
+    
+            yF = accMan->GetAccumulable<G4double>(yFName)->GetValue(); 
+            yD = accMan->GetAccumulable<G4double>(yDName)->GetValue(); 
+            wAv = accMan->GetAccumulable<G4double>(wAvName)->GetValue(); 
+            //G4cout << "yF: " << yF << G4endl;
+            //G4cout << "yD: " << yD/yF << G4endl;
+    
+            yF /= wAv;
+            yD /= wAv;
+    
+            //G4cout << "yF/wAv: " << yF << G4endl;
+            //G4cout << "yD/wAv: " << yD/yF << G4endl;
+    
+            analysisManager->FillNtupleDColumn(0,yF);
+            analysisManager->FillNtupleDColumn(1,yD/yF);
+            //analysisManager->FillNtupleDColumn(wAv);
+    
+            analysisManager->AddNtupleRow();
+        }
+    
+    //    std::vector<G4double> yFs  = fyF.GetValue();
+    //    std::vector<G4double> yDs  = fyD.GetValue();
+    //    std::vector<G4double> wAvs = fWavs.GetValue();
+    //    //if ( IsMaster() ) {
+    //    // Save histograms
+    
         analysisManager->Write();
         analysisManager->CloseFile();
 
-    //}
+
+    }
+
 }

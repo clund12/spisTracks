@@ -1,5 +1,5 @@
 # Initialize the kernel
-/run/numberOfThreads 4
+/run/numberOfThreads 8
 /run/initialize
 
 /gps/particle   proton
@@ -523,4 +523,6 @@
 /gps/number   1
 /gps/ang/type iso
 
-/run/beamOn 10
+/analysis/setFileName /home/chris/geant4/work/Data/Tracks/Neutrons/Testing/yD
+
+/run/beamOn 100

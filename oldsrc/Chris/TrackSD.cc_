@@ -1,7 +1,6 @@
 #include "TrackSD.hh"
 #include "TrackHit.hh"
 #include "Analysis.hh"
-#include "RunAction.hh"
 
 // Geant4 classes
 #include "G4SystemOfUnits.hh"
@@ -14,9 +13,6 @@
 #include "G4ios.hh"
 #include "Randomize.hh"
 #include "G4RandomDirection.hh"
-#include "G4RunManager.hh"
-#include "G4AccumulableManager.hh"
-#include "G4Accumulable.hh"
 
 // C++ classes
 #include <cmath>
@@ -24,13 +20,12 @@
 #include <set>
 #include <iterator>
 #include <algorithm>
-#include <string>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 TrackSD::TrackSD(G4String name)
     : G4VSensitiveDetector(name),
-      //fDose(0),
+      fDose(0),
       fHitsCollection(0),
       fTrackHCID(-1)
 {
@@ -98,15 +93,6 @@ G4bool TrackSD::ProcessHits(G4Step* step, G4TouchableHistory*)
 
 void TrackSD::EndOfEvent(G4HCofThisEvent*)
 {
-    // Get current run action (for accumulables)
-    //const G4UserRunAction* runAction = G4RunManager::GetRunManager()->GetUserRunAction();
-
-    // Get the pointer to the current accumulables manager
-    G4AccumulableManager* accMan = G4AccumulableManager::Instance();
-
-    // Strings for the accumulable names
-    G4String yFName, yDName, wAvName, counterString;
-
     // Get number of hits
     G4int nHits = fHitsCollection->entries();
 
@@ -123,14 +109,9 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
 
     // Sample the random track nSample times
     G4int nSample = 1000;
-
-    // Variables to be used during the calculation
     G4double rR; G4double rTheta; G4double rPhi;
     G4double rX; G4double rY; G4double rZ;
     G4double y; G4double y2;
-
-    // Final vectors to be recorded
-    //std::vector<double>
 
     // Pre-allocate some vectors
     //std::vector<G4double> eImps;
@@ -138,18 +119,11 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
     //std::vector<G4int>    nEdeps;
     //nEdeps.reserve(1000);
     G4double wTp; //weight to account for density of transfer points
-    G4double eImpw   = 0; // sum of energy imparted * wTp
-    G4double eImp2w  = 0; // sum of energy imparted squared * wTp
-    G4double wTps    = 0; // sum of wTps for normalization
-    G4int    counter = 0;;
+    G4double eImpw  = 0; // sum of energy imparted * wTp
+    G4double eImp2w = 0; // sum of energy imparted squared * wTp
+    G4double wTps   = 0; // sum of wTps for normalization
     for ( const auto& radius : radii )
     {
-
-        G4double wAv = GetAssociatedVolumeWeight(radius);
-
-        counterString = std::to_string(counter);
-        wAvName = "wAv"+counterString;
-        *accMan->GetAccumulable<G4double>(wAvName) += wAv;
 
         for ( G4int i=0; i<nSample; i++ )
         {
@@ -241,37 +215,22 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
         y  = eImpw / chord / wTps;
         y2 = eImp2w / (chord*chord) / wTps;
 
-        //G4cout << "y: " << y << ", y2: " << y2 << G4endl;
-        //G4cout << "y*wAv: " << y*wAv << ", y2*wAv: " << y2*wAv << G4endl;
-
-        // Add to the proper accumulables
-        yFName = "yF"+counterString;
-        yDName = "yD"+counterString;
-
-        *accMan->GetAccumulable<G4double>(yFName)  += y*wAv;
-        *accMan->GetAccumulable<G4double>(yDName)  += y2*wAv;
-
-        //G4cout << "acc y*wAv: " << accMan->GetAccumulable<G4double>(yFName)->GetValue();
-        //G4cout << ", acc y2*wAv: " << accMan->GetAccumulable<G4double>(yDName)->GetValue() << G4endl;
-
-        //runAction->SumwAv(y*wAv,counter);
-        //runAction->SumyD(y2*wAv,counter);
-        //runAction->SumwAv(wAv,counter);
+        G4double wAv = GetAssociatedVolumeWeight(radius);
 
         // Get pointer to current analysis manager instance
-        //G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+        G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
-        //analysisManager->FillNtupleDColumn(0, radius/nm);
-        //analysisManager->FillNtupleIColumn(1, nHits);
-        //analysisManager->FillNtupleDColumn(2, y);
-        //analysisManager->FillNtupleDColumn(3, y2);
-//      //  analysisManager->FillNtupleDColumn(2, (eImpw/wTps)/eV);
-//      //  analysisManager->FillNtupleDColumn(3, (eImp2w/wTps)/(eV*eV));
-//      //  analysisManager->FillNtupleDColumn(4, (eImpw/mass)/gray);
-        //analysisManager->FillNtupleDColumn(4, wAv);
-        ////analysisManager->FillNtupleDColumn(4, y2/y);
-        ////analysisManager->FillNtupleDColumn(6, eInc/eV);
-        //analysisManager->AddNtupleRow();
+        analysisManager->FillNtupleDColumn(0, radius/nm);
+        analysisManager->FillNtupleIColumn(1, nHits);
+        analysisManager->FillNtupleDColumn(2, y);
+        analysisManager->FillNtupleDColumn(3, y2);
+//        analysisManager->FillNtupleDColumn(2, (eImpw/wTps)/eV);
+//        analysisManager->FillNtupleDColumn(3, (eImp2w/wTps)/(eV*eV));
+//        analysisManager->FillNtupleDColumn(4, (eImpw/mass)/gray);
+        analysisManager->FillNtupleDColumn(4, wAv);
+        //analysisManager->FillNtupleDColumn(4, y2/y);
+        //analysisManager->FillNtupleDColumn(6, eInc/eV);
+        analysisManager->AddNtupleRow();
             
         // Reset accumulables to zero
         eImpw  = 0;
@@ -279,8 +238,6 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
         wTps   = 0;
         //eImps.clear();
         //nEdeps.clear();
-
-        counter++;
 
     }
 

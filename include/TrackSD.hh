@@ -25,14 +25,15 @@ class TrackSD : public G4VSensitiveDetector
 
       //virtual std::vec<double> GetAssociatedVolumes(std::vec<double>);
       virtual G4double GetAssociatedVolumeWeight(G4double);
+      virtual std::vector< std::vector<int> > Unique(std::vector< std::vector<G4int> >);
 
-      void SetDose(G4double dose) { fDose = dose; }
-      G4double GetDose() const { return fDose; }
+      //void SetDose(G4double dose) { fDose = dose; }
+      //G4double GetDose() const { return fDose; }
 
   private:
       TrackHitsCollection* fHitsCollection;
       G4int fTrackHCID;
-      G4double fDose;
+      //G4double fDose;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

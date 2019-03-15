@@ -12,7 +12,10 @@ class G4Run;
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction();
+    RunAction(G4String);
+    // TIP: avoid constructors with arguments
+    // all data can be retrieved from G4RunManager
+    // or others: G4SDManager::FindSensitiveDetector
     virtual ~RunAction();
 
     //virtual G4Run* GenerateRun();
@@ -21,8 +24,8 @@ class RunAction : public G4UserRunAction
 
   private:
   	G4int    fRunID;
-    G4int    fNradii;
     G4String fFileName;
+
 
 };
 

@@ -3,8 +3,10 @@
 #include "ActionInitialization.hh"
 #include "NullSession.hh"
 
-#include "G4RunManager.hh"
-#include "G4MTRunManager.hh"
+//#include "G4RunManager.hh"
+//#include "G4MTRunManager.hh"
+#include "RunManager.hh"
+#include "MTRunManager.hh"
 
 #include "G4UImanager.hh"
 //#include "G4UIterminal.hh"
@@ -21,11 +23,13 @@ int main(int argc, char* argv[])
 
   G4Random::setTheEngine(new CLHEP::RanluxEngine);
 
+  G4String trString = "/track";
+  G4String outputName = argv[2]+trString+argv[3];
+
 //  G4RunManager* runManager = new G4RunManager();
-    G4MTRunManager* runManager = new G4MTRunManager();
 //  runManager->SetVerboseLevel(0);
 //  runManager->SetPrintProgress(0);
-//  MTRunManager* runManager = new MTRunManager(outputName);
+  MTRunManager* runManager = new MTRunManager(outputName);
   //RunManager* runManager = new RunManager(outputName);
 
   DetectorConstruction* detector = new DetectorConstruction;
@@ -34,7 +38,7 @@ int main(int argc, char* argv[])
   PhysicsList* physics = new PhysicsList;
   runManager->SetUserInitialization(physics);
 
-  ActionInitialization* action = new ActionInitialization();
+  ActionInitialization* action = new ActionInitialization(outputName);
   runManager->SetUserInitialization(action);
 
   // initialize visualization (not that it can take a verbosity argument as a string, e.g. "Quiet")

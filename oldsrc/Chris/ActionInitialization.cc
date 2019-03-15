@@ -7,11 +7,13 @@
 #include "G4UnitsTable.hh"
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
+#include "RunManager.hh"
+#include "MTRunManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::ActionInitialization()
-    : G4VUserActionInitialization()
+ActionInitialization::ActionInitialization(G4String outputName)
+    : G4VUserActionInitialization(), fFileName(outputName)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -23,7 +25,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-    RunAction* runAction = new RunAction();
+    RunAction* runAction = new RunAction(fFileName);
     SetUserAction(runAction);
 
 }
@@ -34,7 +36,7 @@ void ActionInitialization::Build() const
 {
 
   PrimaryGeneratorAction* primGenAction = new PrimaryGeneratorAction();
-  RunAction*              runAction     = new RunAction();
+  RunAction*              runAction     = new RunAction(fFileName);
   EventAction*            evAction      = new EventAction();
 //  StackingAction*         stackAction   = new StackingAction();
 //  SteppingAction*         stepAction    = new SteppingAction();
