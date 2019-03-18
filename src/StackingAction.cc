@@ -30,7 +30,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrac
     if ( particleType == G4Gamma::Gamma() ) {
 
         // G4cout << "A(n) " << particleName << " was killed because it's charge was " << G4BestUnit(charge,"Electric charge") << " and not 0." << G4endl;
-        G4ClassificationOfNewTrack classification = fKill;
+        classification = fKill;
 
     }
 

@@ -1,5 +1,4 @@
 # Initialize the kernel
-/run/numberOfThreads {nThreads}
 /run/initialize
 
 /gps/particle   {pName}
@@ -21,6 +20,5 @@
 /gps/number   1
 /gps/ang/type iso
 
-/analysis/setFileName {outputName}
 
-/run/beamOn {nEvents}
+/run/beamOn 1
