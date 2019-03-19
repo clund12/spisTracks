@@ -218,8 +218,6 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
 
             }
 
-            // Does geant4 handle units properly for the squared case? Something to check if the
-            // results don't match
             // Get weighted energy imparted and energy imparted squared values
             wTp    = 1. / nEdep;
             eImp   = eImp/eV;
@@ -319,7 +317,7 @@ G4double TrackSD::GetAssociatedVolumeWeight(G4double radius)
 
     }
 
-    G4double voxelSide = 2.0 * radius/nm;
+    G4double voxelSide = 2.0 * radius/nm / 3.0;
     G4double voxelDimensions[3];
     voxelDimensions[0] = voxelSide / 2.0;
     voxelDimensions[1] = voxelSide / 2.0;
@@ -458,7 +456,7 @@ G4double TrackSD::GetAssociatedVolumeWeight(G4double radius)
     //std::cout << "Number of unique voxels: " << nUnique << std::endl;
 
     // Calculate the approximate associated volume (aAV) - it is a relative, not absolute, value
-    G4double aAV = nUnique * std::pow(voxelSide, 3);
+    G4double aAV = nUnique * ( CLHEP::pi / 6. ) * std::pow(voxelSide, 3);
 
     //std::cout << "aAV: " << aAV << " nm3" << std::endl;
 
