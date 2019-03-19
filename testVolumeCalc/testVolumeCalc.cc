@@ -17,16 +17,19 @@ void PrintVectorInt(std::vector<int>);
 int main () 
 {
 
-    double R = 2;
+    double R = 2.0;
 
     std::vector<double> d1 { 1., 2., 3. };
     std::vector<double> d2 { 4., 5., 6. };
     std::vector<double> d3 { 3., 2., 1. };
+    std::vector<double> d4 { 21., 22., 23. };
+    std::vector<double> d5 { 3.5, 2., 3. };
     //std::vector< std::vector<double> > D { d1 };
     //std::vector< std::vector<double> > D { d1, d2 };
-    std::vector< std::vector<double> > D { d1, d2, d1, d3 };
+    //std::vector< std::vector<double> > D { d1, d2, d1, d3 };
+    std::vector< std::vector<double> > D { d1, d5 };
 
-    double voxelSide = 2.0 * R;
+    double voxelSide = 2.0 * R / 3.0;
     double voxelDimensions[3];
     voxelDimensions[0] = voxelSide / 2.0;
     voxelDimensions[1] = voxelSide / 2.0;
@@ -165,12 +168,15 @@ int main ()
     //}
 
     int nUnique = collapsedMesh.size();
-    //std::cout << "Number of unique voxels: " << nUnique << std::endl;
+    std::cout << "Number of unique voxel sections: " << nUnique << std::endl;
 
     // Calculate the approximate associated volume (aAV) - it is a relative, not absolute, value
-    double aAV = nUnique * std::pow(voxelSide, 3);
+    double aAV = nUnique * (M_PIl / 6.) * std::pow(voxelSide, 3);
 
-    std::cout << "aAV: " << aAV << " nm3" << std::endl;
+    double worstCase = D.size() * M_PIl * std::pow(R,3) * 4./3.;
+
+    std::cout << "aAV: " << aAV << " nm3" << '\n';
+    std::cout << "worst case spheres: " << worstCase << " nm3" << '\n';
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
