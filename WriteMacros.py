@@ -89,22 +89,25 @@ if len(sys.argv) == 1:
 
     eKin     = input('Initial neutron kinetic energy (with units): ')
 
-    scorer = input('Scorer number (1=inner, 2=intermediate, 3=outer): ')
+    scorer   = input('Scorer number (1=inner, 2=intermediate, 3=outer): ')
 
     nThreads = input('Number of threads: ')
 
     nEvents  = IntOfNEvents(input('Number of primary neutrons per run: '))
 
     nRuns    = int(input('Number of runs: '))
+
+    date     = input('Date that the spectra data was gathered (yyyy-mm-dd): ')
     
 
-elif len(sys.argv) == 7:
+elif len(sys.argv) == 8:
     pName    = sys.argv[1]
     eKin     = sys.argv[2]
     scorer   = sys.argv[3]
     nThreads = sys.argv[4]
     nEvents  = IntOfNEvents(sys.argv[5])
     nRuns    = int(sys.argv[6])
+    date     = sys.argv[7]
 
 else:
     print('Provide, in order:'+'\n'
@@ -114,6 +117,7 @@ else:
             +'the number of threads to be used,'+'\n'
             +'the number of primary particles per run,'+'\n'
             +'the number of runs,'+'\n'
+            +'the date that the spectra data was gathered,'+'\n'
             +'Otherwise, provide no input and follow the prompts.')
     sys.exit()
 
@@ -137,7 +141,7 @@ scorerName = {
         }
 
 # create folder within basePath if it doesn't exist
-folderName = basePath+'/'+eKinForFS+'/'+scorerName[scorer]+'/'+pNameForFS
+folderName = basePath+'/'+date+'/'+eKinForFS+'/'+scorerName[scorer]+'/'+pNameForFS
 os.makedirs(folderName, exist_ok=True)
 
 # create date sub-folder within the (potentially) new particle sub-directory
@@ -145,7 +149,7 @@ os.makedirs(folderName, exist_ok=True)
 #os.makedirs(folderName, exist_ok=True)
 
 # Get proper histogram data
-histoPath = '/home/chris/geant4/work/Data/Spectra/Neutrons/Histos/'
+histoPath = '/home/chris/geant4/work/Data/Spectra/Neutrons/Histos/'+date+'/'
 histoFileName = pName+'s_scorer'+scorer+'_energy_histogram_'+eKinForFS+'.dat'
 
 histoFile = histoPath+histoFileName
@@ -192,7 +196,7 @@ for i in range(nRuns):
         f.write(submissionString.format(**bashParams))
 
     with open('pass-to-blade.sh', 'a') as f:
-        f.write('sbatch -p long -N1 -n'+nThreads+' '+bashName+'\n')
+        f.write('sbatch -p batch -N1 -n'+nThreads+' '+bashName+'\n')
  
 
 #################################################################################
