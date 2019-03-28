@@ -52,7 +52,7 @@ RunAction::RunAction()
     G4AccumulableManager* accMan = G4AccumulableManager::Instance();
 
     // yD accumulables
-    fNradii = 5;
+    fNradii = 8;
     G4String yFName, yDName, wAvName, counterString;
     for ( int i=0; i<fNradii; ++i )
     {

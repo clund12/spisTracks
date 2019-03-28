@@ -4,32 +4,196 @@
 #include <set>
 #include <iterator>
 #include <algorithm>
+#include <map>
 #include <math.h>
 #include <iostream>
+#include <fstream>
 //#include "rt_nonfinite.h"
 //#include "testVolumeCalc.h"
 //#include "bsxfun.h"
 
+double GetVolume(std::vector< std::vector<double> >, double);
 std::vector< std::vector<int> > Unique(std::vector< std::vector<int> >);
+double GetAnalyticalVolume(double, double);
 void PrintVectorDouble(std::vector<double>);
 void PrintVectorInt(std::vector<int>);
 
 int main () 
 {
 
+    //std::vector<double> d1 { 1., 2., 3. };
+    //std::vector<double> d2 { 4., 5., 6. };
+    //std::vector<double> d3 { 3., 2., 1. };
+    //std::vector<double> d4 { 21., 22., 23. };
+    //std::vector<double> d5 { 3.5, 2., 3. };
+    ////std::vector< std::vector<double> > D { d1 };
+    ////std::vector< std::vector<double> > D { d1, d2 };
+    ////std::vector< std::vector<double> > D { d1, d2, d1, d3 };
+    //std::vector< std::vector<double> > D { d1, d5 };
+
     double R = 2.0;
+    std::vector<double> d0 {0., 0., 0.};
+    std::vector< std::vector<double> > D;
+    D.push_back(d0);
 
-    std::vector<double> d1 { 1., 2., 3. };
-    std::vector<double> d2 { 4., 5., 6. };
-    std::vector<double> d3 { 3., 2., 1. };
-    std::vector<double> d4 { 21., 22., 23. };
-    std::vector<double> d5 { 3.5, 2., 3. };
-    //std::vector< std::vector<double> > D { d1 };
-    //std::vector< std::vector<double> > D { d1, d2 };
-    //std::vector< std::vector<double> > D { d1, d2, d1, d3 };
-    std::vector< std::vector<double> > D { d1, d5 };
+    double numPoints = 15000;
+    double offset, offsetX, offsetY, offsetZ;
+    double aAV;
+    std::vector<double> offsetVec;
+    std::map<double, double> offsetVolumes;
+    std::pair<double, double> currentOffsetVolume;
+    //std::vector<double offsets;
+    //std::vector<double> offsetVolumes;
+    
+    double maxOffset  = 2.*std::sqrt(3.)*R;
+    double noOverlapV = 8.*M_PIl*std::pow(R,3.) / 3.;
+    // For offset along face
+    for ( int i=0; i<numPoints+1; ++i )
+    {
+        offset = i*maxOffset/numPoints;
+        offsetVec = {offset, 0., 0.};
+        D.push_back(offsetVec);
 
-    double voxelSide = 2.0 * R / 3.0;
+        aAV = GetVolume(D,R);
+
+        currentOffsetVolume.first = offset / R;
+        currentOffsetVolume.second = aAV / noOverlapV;
+        offsetVolumes.insert(currentOffsetVolume);
+
+        D.erase(D.begin() + 1);
+
+        if ( i % 500 == 0 ) 
+        {
+            std::cout << i << std::endl;
+        }
+
+    }
+
+    std::ofstream offsetFaceData;
+    offsetFaceData.open("OffsetAlongFace.csv");
+    offsetFaceData << "offset along face, aAV" << '\n';
+    for ( auto volume : offsetVolumes )
+    {
+        offsetFaceData << volume.first << ", " << volume.second << '\n';
+        
+    }
+    offsetFaceData.close();
+    offsetVolumes.clear();
+
+    // For offset along planar diagonal
+    for ( int i=0; i<numPoints+1; ++i )
+    {
+        offset = i*maxOffset/numPoints;
+        offsetX = offsetY = offset / std::sqrt(2.);
+        //std::cout << offsetX << ", " << offsetY << ", " << std::endl;
+        offsetVec = {offsetX, offsetY, 0.};
+        D.push_back(offsetVec);
+
+        aAV = GetVolume(D,R);
+
+        currentOffsetVolume.first = offset / R;
+        currentOffsetVolume.second = aAV / noOverlapV;
+        offsetVolumes.insert(currentOffsetVolume);
+
+        D.erase(D.begin() + 1);
+
+        if ( i % 500 == 0 ) 
+        {
+            std::cout << i << std::endl;
+        }
+
+    }
+
+    std::ofstream offsetDiagonalData;
+    offsetDiagonalData.open("OffsetAlongDiagonal.csv");
+    offsetDiagonalData << "offset along diagonal, aAV" << '\n';
+    for ( auto volume : offsetVolumes )
+    {
+        offsetDiagonalData << volume.first << ", " << volume.second << '\n';
+        
+    }
+    offsetDiagonalData.close();
+    offsetVolumes.clear();
+    
+    // For offset along full diagonal
+    for ( int i=0; i<numPoints+1; ++i )
+    {
+        offset = i*maxOffset/numPoints;
+        offsetX = offsetY = offsetZ = offset / std::sqrt(3.);
+        //std::cout << offsetX << ", " << offsetY << ", " << offsetZ << std::endl;
+        offsetVec = {offsetX, offsetY, offsetZ};
+        D.push_back(offsetVec);
+
+        aAV = GetVolume(D,R);
+
+        currentOffsetVolume.first = offset / R;
+        currentOffsetVolume.second = aAV / noOverlapV;
+        offsetVolumes.insert(currentOffsetVolume);
+
+        D.erase(D.begin() + 1);
+
+        if ( i % 500 == 0 ) 
+        {
+            std::cout << i << std::endl;
+        }
+
+    }
+
+    std::ofstream offsetFullDiagonalData;
+    offsetFullDiagonalData.open("OffsetAlongFullDiagonal.csv");
+    offsetFullDiagonalData << "offset along full diagonal, aAV" << '\n';
+    for ( auto volume : offsetVolumes )
+    {
+        offsetFullDiagonalData << volume.first << ", " << volume.second << '\n';
+        
+    }
+    offsetFullDiagonalData.close();
+    offsetVolumes.clear();
+
+
+    // For analytic calculation of the overlap of 2 spheres:
+    double V;
+    for ( int i=0; i<numPoints+1; ++i )
+    {
+        offset = i*maxOffset/numPoints;
+        offsetVec = {offset, 0., 0.};
+
+        V = GetAnalyticalVolume(offset,R);
+
+        currentOffsetVolume.first = offset / R;
+        currentOffsetVolume.second = V / noOverlapV;
+        offsetVolumes.insert(currentOffsetVolume);
+
+        if ( i % 500 == 0 ) 
+        {
+            std::cout << i << std::endl;
+        }
+
+    }
+
+    std::ofstream offsetAnalyticalData;
+    offsetAnalyticalData.open("OffsetAnalytical.csv");
+    offsetAnalyticalData << "offset analytical, V" << '\n';
+    for ( auto volume : offsetVolumes )
+    {
+        offsetAnalyticalData << volume.first << ", " << volume.second << '\n';
+        
+    }
+    offsetAnalyticalData.close();
+    offsetVolumes.clear();
+
+
+
+    return 0;
+
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+double GetVolume(std::vector< std::vector<double> > D, double R)
+{
+    int    voxelDivisions = 3; // Must be odd
+    double voxelSide      = 2.0 * R / voxelDivisions;
     double voxelDimensions[3];
     voxelDimensions[0] = voxelSide / 2.0;
     voxelDimensions[1] = voxelSide / 2.0;
@@ -84,7 +248,7 @@ int main ()
     std::vector<int> meshX, meshY, meshZ;
     std::vector< std::vector<int> > currentMesh;
     std::vector< std::vector< std::vector<int> > > fullMesh;
-    double padding = 1;
+    int padding = (voxelDivisions - 1) / 2;
     for ( int j=0; j<numTPs; j++) 
     {
         currentPos = tpPosData.at(j);
@@ -127,11 +291,11 @@ int main ()
     int voxelXCoord, voxelYCoord, voxelZCoord;
     for ( auto const mesh : fullMesh )
     {
-        for ( int ix=0; ix<3; ++ix )
+        for ( int ix=0; ix<voxelDivisions; ++ix )
         {
-            for ( int iy=0; iy<3; ++iy )
+            for ( int iy=0; iy<voxelDivisions; ++iy )
             {
-                for ( int iz=0; iz<3; ++iz )
+                for ( int iz=0; iz<voxelDivisions; ++iz )
                 {
                     voxelXCoord = mesh.at(0).at(ix);
                     voxelYCoord = mesh.at(1).at(iy);
@@ -168,20 +332,17 @@ int main ()
     //}
 
     int nUnique = collapsedMesh.size();
-    std::cout << "Number of unique voxel sections: " << nUnique << std::endl;
+    //std::cout << "Number of unique voxel sections: " << nUnique << std::endl;
 
     // Calculate the approximate associated volume (aAV) - it is a relative, not absolute, value
     double aAV = nUnique * (M_PIl / 6.) * std::pow(voxelSide, 3);
 
-    double worstCase = D.size() * M_PIl * std::pow(R,3) * 4./3.;
+    //double worstCase = D.size() * M_PIl * std::pow(R,3) * 4./3.;
 
-    std::cout << "aAV: " << aAV << " nm3" << '\n';
-    std::cout << "worst case spheres: " << worstCase << " nm3" << '\n';
+    //std::cout << "aAV: " << aAV << " nm3" << '\n';
+    //std::cout << "worst case spheres: " << worstCase << " nm3" << '\n';
 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-    return 0;
+    return aAV;
 
 }
 
@@ -233,6 +394,29 @@ void PrintVectorDouble(std::vector<double> vec)
         std::cout << *it << "    ";
     } 
     std::cout << std::endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+double GetAnalyticalVolume(double offset, double R)
+{
+
+    double sphereVolume           = 4.*M_PIl*std::pow(R,3.)/3.;
+    double sphereNoIntersectVolume = M_PIl*offset*( R*R - offset*offset/12. );
+
+    double volume;
+    if ( offset < 2.*R )
+    {
+        volume = (sphereVolume + sphereNoIntersectVolume);
+    }
+    else
+    {
+        volume = 2.*sphereVolume;
+    }
+
+
+    return volume;
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

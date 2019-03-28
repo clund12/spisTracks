@@ -112,11 +112,27 @@ void TrackSD::EndOfEvent(G4HCofThisEvent*)
 
     // Set the radii of the scoring volumes to be used
     std::vector<G4double> radii {
-            2.*nm,
-            10.*nm,
-            30.*nm,
-            100.*nm,
-            500.*nm
+            //0.5*nm,
+            //1.*nm,
+            //2.5*nm,
+            //2.*nm,
+            //10.*nm,
+            //30.*nm,
+            //100.*nm,
+            //500.*nm
+            //2.5*nm,
+            //5.*nm,
+            //10.*nm,
+            //15.*nm,
+            //25.*nm
+                1.*nm,
+                5.*nm,
+                10.*nm,
+                15.*nm,
+                25.*nm,
+                50.*nm,
+                100.*nm,
+                500.*nm
             };
 
     //std::vec<double> volumes = GetAssociatedVolumes(radii);
@@ -317,7 +333,8 @@ G4double TrackSD::GetAssociatedVolumeWeight(G4double radius)
 
     }
 
-    G4double voxelSide = 2.0 * radius/nm / 3.0;
+    G4double voxelDivisions = 3.; // Must be odd
+    G4double voxelSide = 2.0 * radius/nm / voxelDivisions;
     G4double voxelDimensions[3];
     voxelDimensions[0] = voxelSide / 2.0;
     voxelDimensions[1] = voxelSide / 2.0;
@@ -369,7 +386,7 @@ G4double TrackSD::GetAssociatedVolumeWeight(G4double radius)
     std::vector<G4int> meshX, meshY, meshZ;
     std::vector< std::vector<G4int> > currentMesh;
     std::vector< std::vector< std::vector<G4int> > > fullMesh;
-    G4double padding = 1;
+    G4int padding = (voxelDivisions - 1) / 2;
     for ( G4int j=0; j<numTPs; j++) 
     {
         currentPos = tpPosData.at(j);
@@ -412,11 +429,11 @@ G4double TrackSD::GetAssociatedVolumeWeight(G4double radius)
     G4int voxelXCoord, voxelYCoord, voxelZCoord;
     for ( auto const mesh : fullMesh )
     {
-        for ( G4int ix=0; ix<3; ++ix )
+        for ( G4int ix=0; ix<voxelDivisions; ++ix )
         {
-            for ( G4int iy=0; iy<3; ++iy )
+            for ( G4int iy=0; iy<voxelDivisions; ++iy )
             {
-                for ( G4int iz=0; iz<3; ++iz )
+                for ( G4int iz=0; iz<voxelDivisions; ++iz )
                 {
                     voxelXCoord = mesh.at(0).at(ix);
                     voxelYCoord = mesh.at(1).at(iy);
@@ -505,4 +522,3 @@ std::vector< std::vector<G4int> > TrackSD::Unique( std::vector< std::vector<G4in
     return vec;
 
 }
-
