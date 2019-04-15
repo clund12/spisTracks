@@ -1,0 +1,7 @@
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/install/strip.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/edit_cache.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/spisTracks.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/install.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/rebuild_cache.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/list_install_components.dir
+/home/chris/geant4/work/spisTracks/build/CMakeFiles/install/local.dir

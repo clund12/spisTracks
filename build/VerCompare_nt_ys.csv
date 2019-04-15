@@ -1,0 +1,11 @@
+#class tools::wcsv::ntuple
+#title Microdosimetric distributions
+#separator 44
+#vector_separator 59
+#column double yF [keV/um]
+#column double yD [keV/um]
+10.4578,23.1895
+10.9582,23.5152
+11.2886,22.2422
+11.0919,20.5572
+10.2055,17.2791

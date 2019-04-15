@@ -29,8 +29,14 @@ combined = combined.loc[:,~combined.columns.duplicated()]
 
 combined.plot(x='offset',y=['Along face', 'Along planar diagonal', 'Along full diagonal','Analytic'],figsize=(9,6))
 
-plt.xlabel('Centre-centre distance [1/radius]', fontsize=16)
-plt.ylabel('Volume / non-overlapping volume', fontsize=16)
-plt.title('Approximation of the volume of two overlapping spheres using cubes', fontsize=18)
+plt.xlabel('Centre-centre distance [1/radius]', fontsize=18)
+plt.ylabel('Volume / non-overlapping volume', fontsize=18)
+plt.legend(fontsize=16)
+plt.title('Approximation of the volume of two overlapping spheres', fontsize=18)# using cubes', fontsize=18)
 
-plt.show()
+#plt.show()
+plt.savefig('AVcomparison.png',
+        format='png',
+        dpi=500,
+        bbox_inches='tight'
+        )
