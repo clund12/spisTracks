@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-path = '/home/chris/geant4/work/spisTracks/testVolumeCalc/'
+path = '~/geant4/work/spisTracks/testVolumeCalc/'
 
 
 offsetAlongFace = pd.read_csv(path+'OffsetAlongFace.csv', header=0, index_col=False)
@@ -29,7 +29,7 @@ combined = combined.loc[:,~combined.columns.duplicated()]
 
 combined.plot(x='offset',y=['Along face', 'Along planar diagonal', 'Along full diagonal','Analytic'],figsize=(9,6))
 
-plt.xlabel('Centre-centre distance [1/radius]', fontsize=18)
+plt.xlabel('Centre-centre distance (1/radius)', fontsize=18)
 plt.ylabel('Volume / non-overlapping volume', fontsize=18)
 plt.legend(fontsize=16)
 plt.title('Approximation of the volume of two overlapping spheres', fontsize=18)# using cubes', fontsize=18)
